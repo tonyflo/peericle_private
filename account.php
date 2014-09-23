@@ -5,6 +5,8 @@
  * @brief Functions that allow a user to interact with their data
  */
 
+require_once "return_codes.php";
+
 /*************************************************************************
  * Private Helper Functions
  ************************************************************************/
@@ -46,8 +48,8 @@ function pw_hash($password)
  * @param table the table name
  *
  * @retval The user's id associated with a valid email and password
- * @retval -5 if the email was not found in the database
- * @retval -6 if the password is wrong
+ * @retval RET_EMAIL_NOT_FOUND if the email was not found in the database
+ * @retval RET_INVALID_PASSWORD if the password is wrong
  */
 function sign_in($email, $password, $db, $table)
 {
@@ -72,7 +74,7 @@ function sign_in($email, $password, $db, $table)
       if ($valid != 0)
       {
         //the provided password was wrong
-        return -6;
+        return $GLOBALS['RET_INVALID_PASSWORD'];
       }
 
       //the provided password was correct so return the valid user_id
@@ -81,7 +83,7 @@ function sign_in($email, $password, $db, $table)
    else
    {
       //the email was not found
-      return -5;
+      return $GLOBALS['RET_EMAIL_NOT_FOUND'];
    }
 } //end sign_in()
 
@@ -103,9 +105,9 @@ function sign_in($email, $password, $db, $table)
  * @param table The table name
  *
  * @retval The primary key associated with the new account
- * @retval -2 if the email address is in use
- * @retval -3 if signing up fails
- * @retval -4 if a parameter was that's not allowed to be
+ * @retval RET_EMAIL_NOT_AVAILABLE if the email address is in use
+ * @retval RET_SIGN_UP_FAILED if signing up fails
+ * @retval RET_NULL_PARAM if a parameter was that's not allowed to be
  */
 function sign_up($title, $first_name, $last_name, $role, $email, $phone, $password, $dob, $topic_id, $gender, $db, $table)
 {
@@ -116,7 +118,7 @@ function sign_up($title, $first_name, $last_name, $role, $email, $phone, $passwo
 	  $email == null ||
 	  $password == null)
    {
-      return -4;
+      return $GLOBALS['RET_NULL_PARAM'];
    }
    //check that the email doesn't exist in the db
    $queryA="select * from ".$table." where email=?";
@@ -131,7 +133,7 @@ function sign_up($title, $first_name, $last_name, $role, $email, $phone, $passwo
    if($numrowsA != 0)
    {
       //the email address is taken so return error code
-      return -2;
+      return $GLOBALS['RET_EMAIL_NOT_AVAILABLE'];
    }
    //hash the password
    $hash=pw_hash($password);
@@ -155,7 +157,7 @@ function sign_up($title, $first_name, $last_name, $role, $email, $phone, $passwo
    else
    {
       //something went wrong when signing up
-      return -3;
+      return $GLOBALS['RET_SIGN_UP_FAILED'];
    }
 
 } //end sign_up()
