@@ -5,12 +5,10 @@
  * @brief Functions that allow a user to interact with their data
  */
 
- $SUCCESS = 0;
-
 /*************************************************************************
  * Private Helper Functions
  ************************************************************************/
- 
+
  /*
  * @brief Converts a string into a hash
  * @source http://alias.io/2010/01/store-passwords-safely-with-php-and-mysql/
@@ -35,11 +33,10 @@ function pw_hash($password)
     return $hashed;
 } //end pw_hash()
 
- 
 /*************************************************************************
  * Public MySQL Functions
  ************************************************************************/
- 
+
  /*
  * @brief Allows a user to sign into their account
  * @param email User's email
@@ -87,7 +84,7 @@ function sign_in($email, $password, $db, $table)
       return -5;
    }
 } //end sign_in()
- 
+
 /*
  * @brief Allows a user to sign up for an account
  *
@@ -100,7 +97,7 @@ function sign_in($email, $password, $db, $table)
  * @param password A password between 6 and 255 characters
  * @param dob The birthdate of the user
  * @param topic_id The academic discipline that the user is associated with
- * @param gender the gender of account: 0 if male, 1 is female 
+ * @param gender the gender of account: 0 if male, 1 is female
  *
  * @param db The database object
  * @param table The table name
@@ -112,6 +109,7 @@ function sign_in($email, $password, $db, $table)
  */
 function sign_up($title, $first_name, $last_name, $role, $email, $phone, $password, $dob, $topic_id, $gender, $db, $table)
 {
+
    // Check for NULL values
    if($first_name == null ||
       $last_name == null ||
@@ -120,7 +118,6 @@ function sign_up($title, $first_name, $last_name, $role, $email, $phone, $passwo
    {
       return -4;
    }
-
    //check that the email doesn't exist in the db
    $queryA="select * from ".$table." where email=?";
    $sqlA=$db->prepare($queryA);
@@ -136,17 +133,16 @@ function sign_up($title, $first_name, $last_name, $role, $email, $phone, $passwo
       //the email address is taken so return error code
       return -2;
    }
-
    //hash the password
    $hash=pw_hash($password);
-   
+
    //get the date
-   $date = date("Y-m-d H:i:s")
+   $date = date("Y-m-d H:i:s");
 
    //the email address is available so proceed with creating account
-   $query2="insert into ".$table."(title, first_name, last_name, email, account_creation_date_time, phone, password, dob, last_logon_date_time, topic_id, gender) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+   $query2="insert into ".$table."(title, first_name, last_name, role, email, account_creation_date_time, phone, password, dob, last_logon_date_time, topic_id, gender) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
    $sql2=$db->prepare($query2);
-   $sql2->bind_param('sssssssssii', $title, $first_name, $last_name, $email, $date, $phone, $password, $dob, $date, $topic_id, $gender);
+   $sql2->bind_param('ssssssssssii', $title, $first_name, $last_name, $role, $email, $date, $phone, $hash, $dob, $date, $topic_id, $gender);
    $sql2->execute();
    $sql2->free_result();
 
@@ -161,6 +157,7 @@ function sign_up($title, $first_name, $last_name, $role, $email, $phone, $passwo
       //something went wrong when signing up
       return -3;
    }
+
 } //end sign_up()
- 
- ?>
+
+?>
